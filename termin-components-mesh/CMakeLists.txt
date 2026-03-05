@@ -11,7 +11,7 @@ find_package(termin_scene REQUIRED)
 find_package(termin_inspect REQUIRED)
 find_package(termin_mesh REQUIRED)
 
-include(${CMAKE_CURRENT_LIST_DIR}/../../termin-modules/cmake/TerminModule.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/TerminModule.cmake)
 
 termin_add_module(
     NAME termin_components_mesh

@@ -36,13 +36,6 @@ jobs:
           gh release download sdk-latest -R ${{ github.repository_owner }}/termin-collision -p sdk-collision.tar.gz -D /tmp
           sudo tar xzf /tmp/sdk-collision.tar.gz -C /
 
-      - name: Checkout termin-modules (shared cmake)
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository_owner }}/termin-modules
-          token: ${{ secrets.CLONETOKEN }}
-          path: termin-modules
-
       - name: Build and install termin-components-collision
         run: |
           cmake -S termin-components-collision -B termin-components-collision/build \
