@@ -51,7 +51,9 @@ jobs:
           cmake -S termin-components-collision -B termin-components-collision/build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/opt/termin \
-            -DCMAKE_PREFIX_PATH=/opt/termin
+            -DCMAKE_PREFIX_PATH=/opt/termin \
+            -DTERMIN_BUILD_PYTHON=ON \
+            -DPython_EXECUTABLE=$(which python3)
           cmake --build termin-components-collision/build --parallel
           sudo cmake --install termin-components-collision/build
 
@@ -60,7 +62,9 @@ jobs:
           cmake -S termin-components-mesh -B termin-components-mesh/build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/opt/termin \
-            -DCMAKE_PREFIX_PATH=/opt/termin
+            -DCMAKE_PREFIX_PATH=/opt/termin \
+            -DTERMIN_BUILD_PYTHON=ON \
+            -DPython_EXECUTABLE=$(which python3)
           cmake --build termin-components-mesh/build --parallel
           sudo cmake --install termin-components-mesh/build
 
