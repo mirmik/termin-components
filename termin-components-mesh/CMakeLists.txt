@@ -44,5 +44,7 @@ if(TERMIN_BUILD_PYTHON)
 
     if(TERMIN_COMPONENTS_MESH_PYTHON_PREFIX)
         install(TARGETS _components_mesh_native DESTINATION ${TERMIN_COMPONENTS_MESH_PYTHON_PREFIX}/mesh)
+    else()
+        install(TARGETS _components_mesh_native DESTINATION lib/python/termin/mesh)
     endif()
 endif()

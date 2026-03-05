@@ -45,5 +45,7 @@ if(TERMIN_BUILD_PYTHON)
 
     if(TERMIN_COMPONENTS_COLLISION_PYTHON_PREFIX)
         install(TARGETS _components_collision_native DESTINATION ${TERMIN_COMPONENTS_COLLISION_PYTHON_PREFIX}/colliders)
+    else()
+        install(TARGETS _components_collision_native DESTINATION lib/python/termin/colliders)
     endif()
 endif()
