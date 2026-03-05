@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+env:
+  LD_LIBRARY_PATH: /opt/termin/lib
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Python dependencies
+        run: pip install --upgrade pip setuptools wheel nanobind
+
+      - name: Download upstream SDKs
+        env:
+          GH_TOKEN: ${{ secrets.CLONETOKEN }}
+        run: |
+          gh release download sdk-latest -R ${{ github.repository_owner }}/termin-collision -p sdk-collision.tar.gz -D /tmp
+          sudo tar xzf /tmp/sdk-collision.tar.gz -C /
+
+      - name: Checkout termin-modules (shared cmake)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/termin-modules
+          token: ${{ secrets.CLONETOKEN }}
+          path: termin-modules
+
+      - name: Build and install termin-components-collision
+        run: |
+          cmake -S termin-components-collision -B termin-components-collision/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/opt/termin \
+            -DCMAKE_PREFIX_PATH=/opt/termin
+          cmake --build termin-components-collision/build --parallel
+          sudo cmake --install termin-components-collision/build
+
+      - name: Build and install termin-components-mesh
+        run: |
+          cmake -S termin-components-mesh -B termin-components-mesh/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/opt/termin \
+            -DCMAKE_PREFIX_PATH=/opt/termin
+          cmake --build termin-components-mesh/build --parallel
+          sudo cmake --install termin-components-mesh/build
+
+      - name: Publish SDK artifact
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tar czf /tmp/sdk-components.tar.gz -C / opt/termin
+          gh release create sdk-latest --title "SDK (latest)" --notes "Auto-built from $(git rev-parse --short HEAD)" --prerelease 2>/dev/null || true
+          gh release upload sdk-latest /tmp/sdk-components.tar.gz --clobber
