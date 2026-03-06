@@ -68,6 +68,17 @@ jobs:
           cmake --build termin-components-mesh/build --parallel
           sudo cmake --install termin-components-mesh/build
 
+      - name: Build and install termin-components-kinematic
+        run: |
+          cmake -S termin-components-kinematic -B termin-components-kinematic/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/opt/termin \
+            -DCMAKE_PREFIX_PATH=/opt/termin \
+            -DTERMIN_BUILD_PYTHON=ON \
+            -DPython_EXECUTABLE=$(which python3)
+          cmake --build termin-components-kinematic/build --parallel
+          sudo cmake --install termin-components-kinematic/build
+
       - name: Publish SDK artifact
         if: github.event_name == 'push'
         env:
@@ -75,6 +86,7 @@ jobs:
         run: |
           sudo DESTDIR=/tmp/staging cmake --install termin-components-collision/build
           sudo DESTDIR=/tmp/staging cmake --install termin-components-mesh/build
+          sudo DESTDIR=/tmp/staging cmake --install termin-components-kinematic/build
           tar czf /tmp/sdk-components.tar.gz -C /tmp/staging opt/termin
           gh release create sdk-latest --title "SDK (latest)" --notes "Auto-built from $(git rev-parse --short HEAD)" --prerelease 2>/dev/null || true
           gh release upload sdk-latest /tmp/sdk-components.tar.gz --clobber
